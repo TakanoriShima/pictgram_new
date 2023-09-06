@@ -10,4 +10,5 @@ spring:
     show-sql: true
    
 debug: true      
-
+image:
+  local: true
