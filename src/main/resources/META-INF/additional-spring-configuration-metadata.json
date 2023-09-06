@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "spring.servlet.servlet-name",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.servlet.servlet-name'"
+  },
+  {
+    "name": "spring.servlet.url-mapping",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.servlet.url-mapping'"
+  }
+]}
