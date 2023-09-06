@@ -19,12 +19,12 @@ import com.example.pictgram.repository.UserRepository;
 @Controller
 public class UsersController {
 
-//	@Autowired
+	//	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-//	@Autowired
+	//	@Autowired
 	private UserRepository repository;
-	
+
 	private UsersController(PasswordEncoder passwordEncoder, UserRepository repository) {
 		this.passwordEncoder = passwordEncoder;
 		this.repository = repository;
@@ -32,6 +32,7 @@ public class UsersController {
 
 	@GetMapping(path = "/users/new")
 	public String newUser(Model model) {
+		System.out.println("ここだよ！new");
 		model.addAttribute("form", new UserForm());
 		return "users/new";
 	}
@@ -39,10 +40,13 @@ public class UsersController {
 	@PostMapping("/user")
 	public String create(@Validated @ModelAttribute("form") UserForm form, BindingResult result, Model model,
 			RedirectAttributes redirAttrs) {
+
 		String name = form.getName();
 		String email = form.getEmail();
 		String password = form.getPassword();
 		String passwordConfirmation = form.getPasswordConfirmation();
+		System.out.println("ここだよ！ create");
+		System.out.println(name);
 
 		if (repository.findByUsername(email) != null) {
 			FieldError fieldError = new FieldError(result.getObjectName(), "email", "その E メールはすでに使用されています。");

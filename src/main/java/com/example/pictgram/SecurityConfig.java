@@ -2,67 +2,70 @@ package com.example.pictgram;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.SecurityFilterChain;
 
 import com.example.pictgram.filter.FormAuthenticationProvider;
-import com.example.pictgram.repository.UserRepository;
 
 @Configuration
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig  {
 
     protected static Logger log = LoggerFactory.getLogger(SecurityConfig.class);
 
-    @Autowired
-    private UserRepository repository;
-
-    @Autowired
-    UserDetailsService service;
-
-    @Autowired
     private FormAuthenticationProvider authenticationProvider;
-
-    private static final String[] URLS = { "/css/**", "/images/**", "/scripts/**", "/h2-console/**" };
-
-    /**
-    * 認証から除外する
-    */
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers(URLS);
+    
+    public SecurityConfig(FormAuthenticationProvider authenticationProvider) {
+    	this.authenticationProvider = authenticationProvider;
     }
 
-    /**
-    * 認証を設定する
-    */
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        // @formatter:off
-        http.authorizeRequests().antMatchers("/login", "/logout-complete", "/users/new", "/user").permitAll()
-                .anyRequest().authenticated()
-                // ログアウト処理
-                .and().logout().logoutUrl("/logout").logoutSuccessUrl("/logout-complete").clearAuthentication(true)
-                .deleteCookies("JSESSIONID")
-                .invalidateHttpSession(true).permitAll().and().csrf()
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                // form
-                .and().formLogin().loginPage("/login").defaultSuccessUrl("/topics").failureUrl("/login-failure")
-                .permitAll();
-        // @formatter:on
+    private static final String[] URLS = { "/css/**", "/images/**", "/scripts/**", "/h2-console/**", "/users/new", "/user", "/" };
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    	// @formatter:off
+    	http.authorizeHttpRequests(authz -> authz
+                .requestMatchers(URLS)    // 認証不要なパスを指定
+                .permitAll()
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()) // css,jsなどのリソースも認証不要
+                .permitAll()
+                .requestMatchers("/login")
+                .permitAll()
+                .anyRequest().authenticated())  // antMatchersで指定したパス以外認証する
+        .formLogin(login -> login
+                .loginProcessingUrl("/login")  // ログイン情報の送信先
+                .loginPage("/login")           // ログイン画面
+                .defaultSuccessUrl("/topics")        // ログイン成功時の遷移先
+                .failureUrl("/login-failure")    // ログイン失敗時の遷移先
+                .permitAll())                  // 未ログインでもアクセス可能
+        .logout(logout -> logout
+                .logoutSuccessUrl("/logout-complete")    // ログアウト成功時の遷移先
+                .permitAll())
+        .cors(cors -> cors.disable())
+        .csrf((csrf) -> csrf.disable());
+    	// @formatter:on
+    	
+        return http.build();
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(authenticationProvider);
+
+    @Bean
+    public FormAuthenticationProvider userDetailsService() {
+        return new FormAuthenticationProvider();
+    }
+    
+    @Bean
+    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder =
+            http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder.authenticationProvider(authenticationProvider);
+        return authenticationManagerBuilder.build();
     }
 
     @Bean

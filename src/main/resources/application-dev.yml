@@ -1,11 +1,13 @@
 spring:
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:pictgram
-    username: sa
-    password: 
-
-  h2:
-    console:
-      enabled: true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/demo_db?useAffectedRows=true&useUnicode=true&characterEncoding=utf8
+    username: root
+    password: m%EL78rT
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+   
 debug: true      
+
