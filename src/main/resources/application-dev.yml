@@ -6,7 +6,7 @@ spring:
     password: m%EL78rT
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
    
 debug: true      
