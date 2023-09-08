@@ -130,7 +130,7 @@ public class TopicsController {
 				form.setFavorite(favorite);
 			}
 		}
-
+		form.setFavorites(favorites);
 		return form;
 	}
 
