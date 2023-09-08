@@ -5,11 +5,6 @@
 
 <head>
 	<title>Pictgram</title>
-	<style>
-		button {
-			border: none;
-		}
-	</style>
 </head>
 
 <body>
@@ -25,27 +20,20 @@
 							class="image" />
 						<p th:value="${topic.favorite}"></p>
 						<div class="icons">
+
 							<a th:if="${topic.favorite != null}" rel="nofollow" class="icon convert"
-								 href="/favorite?topic_id=1" th:href="@{'/favorite'}"
+								data-method="delete" href="/favorite?topic_id=1" th:href="@{'/favorite'}"
 								th:data-topic_id="${topic.id}" th:data-_csrf="${_csrf.token}">
 								<img class="favorite-on" src="/images/icons/heart.png"
 									th:src="@{/images/icons/heart.png}" />
 							</a>
-
-<!--							<form th:if="${topic.favorite != null}" acton="#" th:action="@{/favorite}" method="POST">-->
-<!--								<input type="hidden" name="_method" value="DELETE">-->
-<!--								<input type="hidden" name="_csrf" th:value="${_csrf.token}">-->
-<!--								<input type="hidden" name="topic_id" th:value="${topic.id}">-->
-<!--								<button type="submit"><img class="favorite-on" src="/images/icons/heart.png"-->
-<!--										th:src="@{/images/icons/heart.png}" /></button>-->
-<!--							</form>-->
 
 							<a th:if="${topic.favorite == null}" rel="nofollow" class="icon convert" data-method="post"
 								href="#" th:href="@{'/favorite'}" th:data-topic_id="${topic.id}"
 								th:data-_csrf="${_csrf.token}">
 								<img src="/images/icons/heart-black.png" th:src="@{/images/icons/heart-black.png}" />
 							</a>
-							<!--							<span class="count" th:text="${#lists.size(topic.favorites)}">0</span>-->
+<!--							<span class="count" th:text="${#lists.size(topic.favorites)}">0</span>-->
 						</div>
 						<pre class="description" th:text="${topic.description}"></pre>
 					</main>

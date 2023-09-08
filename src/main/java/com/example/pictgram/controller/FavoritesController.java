@@ -11,6 +11,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -76,8 +77,8 @@ public class FavoritesController {
     }
 
 //    @RequestMapping(value = "/favorite", method = RequestMethod.DELETE)
-    @GetMapping("/favorite")
-//    @DeleteMapping("/favorite")
+//    @GetMapping("/favorite")
+    @DeleteMapping("/favorite")
     @Transactional
     public String destroy(Principal principal, @RequestParam("topic_id") long topicId, RedirectAttributes redirAttrs,
             Locale locale) {
