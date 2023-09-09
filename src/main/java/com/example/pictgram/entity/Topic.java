@@ -19,7 +19,7 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "topic")
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class Topic extends AbstractEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -46,8 +46,12 @@ public class Topic extends AbstractEntity implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "userId", insertable = false, updatable = false)
 	private User user;
-	
+
 	@OneToMany
 	@JoinColumn(name = "topicId", insertable = false, updatable = false)
 	private List<Favorite> favorites;
+
+	@OneToMany
+	@JoinColumn(name = "topicId", insertable = false, updatable = false)
+	private List<Comment> comments;
 }
