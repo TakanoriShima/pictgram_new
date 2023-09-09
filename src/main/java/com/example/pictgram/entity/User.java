@@ -18,10 +18,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Table(name = "users")
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class User extends AbstractEntity implements UserDetails, UserInf {
     private static final long serialVersionUID = 1L;
 

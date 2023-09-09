@@ -22,24 +22,20 @@ public class SessionsController {
 	}
 
 	@GetMapping("/login-failure")
-	//    public String loginFailure(Model model) {
 	public String loginFailure(Model model, Locale locale) {
 		model.addAttribute("hasMessage", true);
 		model.addAttribute("class", "alert-danger");
-		//		model.addAttribute("message", "Emailまたはパスワードに誤りがあります。");
 		model.addAttribute("message", messageSource.getMessage("sessions.loginFailure.flash", new String[] {}, locale));
 
 		return "sessions/new";
 	}
 
 	@GetMapping("/logout-complete")
-	//	public String logoutComplete(Model model) {
 	public String logoutComplete(Model model, Locale locale) {
-		System.out.println("ログアウトだよ");
 		model.addAttribute("hasMessage", true);
 		model.addAttribute("class", "alert-info");
-//		model.addAttribute("message", "ログアウトしました。");
-		model.addAttribute("message", messageSource.getMessage("sessions.logoutComplete.flash", new String[] {}, locale));
+		model.addAttribute("message",
+				messageSource.getMessage("sessions.logoutComplete.flash", new String[] {}, locale));
 
 		return "layouts/complete";
 	}

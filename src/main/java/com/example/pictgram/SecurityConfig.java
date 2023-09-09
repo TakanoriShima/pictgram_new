@@ -32,15 +32,10 @@ public class SecurityConfig {
 		http.authorizeHttpRequests(authz -> authz
 				.requestMatchers(URLS) // 認証不要なパスを指定
 				.permitAll()
-//				.requestMatchers(HttpMethod.DELETE, "/").permitAll()
-				//                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()) // css,jsなどのリソースも認証不要
-				//                .permitAll()
+
 				.requestMatchers("/login")
 				.permitAll()
-				//				.requestMatchers(HttpMethod.DELETE)
-				//				.permitAll()
-				//				.requestMatchers(HttpMethod.DELETE, "/favorite")
-				//				.permitAll()
+
 				.anyRequest().authenticated()) // antMatchersで指定したパス以外認証する
 				.formLogin(login -> login
 						.loginProcessingUrl("/login") // ログイン情報の送信先
@@ -52,22 +47,18 @@ public class SecurityConfig {
 						.logoutSuccessUrl("/logout-complete") // ログアウト成功時の遷移先
 						.invalidateHttpSession(true)
 						.deleteCookies("JSESSIONID")
-						//                .csrf((csrf) -> csrf.disable())
 						.permitAll())
 
 				.cors(cors -> cors.disable());
-		//        .csrf((csrf) -> csrf.disable());
 		// @formatter:on
 
 		return http.build();
 	}
 
-	@Bean
 	public FormAuthenticationProvider userDetailsService() {
 		return new FormAuthenticationProvider();
 	}
 
-	@Bean
 	public AuthenticationManager authManager(HttpSecurity http) throws Exception {
 		AuthenticationManagerBuilder authenticationManagerBuilder = http
 				.getSharedObject(AuthenticationManagerBuilder.class);

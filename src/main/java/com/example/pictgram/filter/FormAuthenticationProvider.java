@@ -18,42 +18,41 @@ import com.example.pictgram.repository.UserRepository;
 @Configuration
 public class FormAuthenticationProvider implements AuthenticationProvider {
 
-    protected static Logger log = LoggerFactory.getLogger(FormAuthenticationProvider.class);
+	protected static Logger log = LoggerFactory.getLogger(FormAuthenticationProvider.class);
 
-    @Autowired
-    private UserRepository repository;
+	@Autowired
+	private UserRepository repository;
 
-    @Autowired
-    @Lazy
-    private PasswordEncoder passwordEncoder;
+	@Autowired
+	@Lazy
+	private PasswordEncoder passwordEncoder;
 
-    @Override
-    public Authentication authenticate(Authentication auth) throws AuthenticationException {
-        String name = auth.getName();
-        String password = auth.getCredentials().toString();
+	@Override
+	public Authentication authenticate(Authentication auth) throws AuthenticationException {
+		String name = auth.getName();
+		String password = auth.getCredentials().toString();
 
-        log.debug("name={}", name);
-        log.debug("password={}", password);
+		log.debug("name={}", name);
+		log.debug("password={}", password);
 
-        if ("".equals(name) || "".equals(password)) {
-            throw new AuthenticationCredentialsNotFoundException("ログイン情報に不備があります。");
-        }
+		if ("".equals(name) || "".equals(password)) {
+			throw new AuthenticationCredentialsNotFoundException("ログイン情報に不備があります。");
+		}
 
-        User entity = repository.findByUsername(name);
-        if (entity == null) {
-            throw new AuthenticationCredentialsNotFoundException("ログイン情報が存在しません。");
-        }
+		User entity = repository.findByUsername(name);
+		if (entity == null) {
+			throw new AuthenticationCredentialsNotFoundException("ログイン情報が存在しません。");
+		}
 
-        // 追加 入力されたパスワードとデータベースのパスワードを比較
-        if (!passwordEncoder.matches(password, entity.getPassword())) {
-            throw new AuthenticationCredentialsNotFoundException("ログイン情報に不備があります。");
-        }
+		if (!passwordEncoder.matches(password, entity.getPassword())) {
+			throw new AuthenticationCredentialsNotFoundException("ログイン情報に不備があります。");
+		}
 
-        return new UsernamePasswordAuthenticationToken(entity, password, entity.getAuthorities());
-    }
+		return new UsernamePasswordAuthenticationToken(entity, password, entity.getAuthorities());
+	}
 
-    @Override
-    public boolean supports(Class<?> authentication) {
-        return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
-    }
+	@Override
+	public boolean supports(Class<?> authentication) {
+		return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
+	}
 }

@@ -14,10 +14,12 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Table(name = "topic")
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class Topic extends AbstractEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
