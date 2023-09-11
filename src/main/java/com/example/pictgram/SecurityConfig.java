@@ -14,6 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import com.example.pictgram.filter.FormAuthenticationProvider;
 
 @Configuration
+//@EnableWebSecurity
 public class SecurityConfig {
 
 	protected static Logger log = LoggerFactory.getLogger(SecurityConfig.class);
@@ -24,18 +25,16 @@ public class SecurityConfig {
 		this.authenticationProvider = authenticationProvider;
 	}
 
-	private static final String[] URLS = { "/users/new", "/user", "/", "/css/**", "/scripts/**", "/images/**" };
+	private static final String[] URLS = { "/login", "/users/new", "/user", "/css/**", "/scripts/**", "/images/**",
+			"/" };
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
 		// @formatter:off
 		http.authorizeHttpRequests(authz -> authz
 				.requestMatchers(URLS) // 認証不要なパスを指定
 				.permitAll()
-
-				.requestMatchers("/login")
-				.permitAll()
-
 				.anyRequest().authenticated()) // antMatchersで指定したパス以外認証する
 				.formLogin(login -> login
 						.loginProcessingUrl("/login") // ログイン情報の送信先
@@ -48,8 +47,8 @@ public class SecurityConfig {
 						.invalidateHttpSession(true)
 						.deleteCookies("JSESSIONID")
 						.permitAll())
-
 				.cors(cors -> cors.disable());
+
 		// @formatter:on
 
 		return http.build();

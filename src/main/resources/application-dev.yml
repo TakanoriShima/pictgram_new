@@ -1,13 +1,30 @@
 spring:
+# h2 http://localhost:8080/h2-console
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/demo_db?useAffectedRows=true&useUnicode=true&characterEncoding=utf8
-    username: root
-    password: m%EL78rT
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:pictgram
+    username: sa
+    password: 
+
+  h2:
+    console:
+      enabled: false
+      path: /h2-console
+
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: true     
+# MySQL
+  #datasource:
+  #  driver-class-name: com.mysql.cj.jdbc.Driver
+  #  url: jdbc:mysql://localhost:3306/demo_db?useAffectedRows=true&useUnicode=true&characterEncoding=utf8
+  #  username: root
+  #  password: m%EL78rT
+  #jpa:
+  #  hibernate:
+  #    ddl-auto: update
+  #  show-sql: true
   mvc:
     hiddenmethod:
       filter:
