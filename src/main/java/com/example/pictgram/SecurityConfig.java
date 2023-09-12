@@ -7,14 +7,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 import com.example.pictgram.filter.FormAuthenticationProvider;
 
 @Configuration
-//@EnableWebSecurity
+@EnableWebSecurity
 public class SecurityConfig {
 
 	protected static Logger log = LoggerFactory.getLogger(SecurityConfig.class);
@@ -25,15 +31,25 @@ public class SecurityConfig {
 		this.authenticationProvider = authenticationProvider;
 	}
 
-	private static final String[] URLS = { "/login", "/users/new", "/user", "/css/**", "/scripts/**", "/images/**",
-			"/" };
-
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector)
+			throws Exception {
+		MvcRequestMatcher h2RequestMatcher = new MvcRequestMatcher(introspector, "/**");
+		h2RequestMatcher.setServletPath("/h2-console");
 
+		RequestMatcher publicMatchers = new OrRequestMatcher(
+				new AntPathRequestMatcher("/h2-console/**"),
+				new AntPathRequestMatcher("/login"),
+				new AntPathRequestMatcher("/users/new"),
+				new AntPathRequestMatcher("/user"),
+				new AntPathRequestMatcher("/css/**"),
+				new AntPathRequestMatcher("/scripts/**"),
+				new AntPathRequestMatcher("/images/**"),
+				new AntPathRequestMatcher("/"));
+		
 		// @formatter:off
 		http.authorizeHttpRequests(authz -> authz
-				.requestMatchers(URLS) // 認証不要なパスを指定
+				.requestMatchers(publicMatchers)
 				.permitAll()
 				.anyRequest().authenticated()) // antMatchersで指定したパス以外認証する
 				.formLogin(login -> login
@@ -47,8 +63,11 @@ public class SecurityConfig {
 						.invalidateHttpSession(true)
 						.deleteCookies("JSESSIONID")
 						.permitAll())
+				.csrf(csrf -> csrf
+						.ignoringRequestMatchers(h2RequestMatcher))
+				.headers(headers -> headers.frameOptions(
+						frame -> frame.sameOrigin()))
 				.cors(cors -> cors.disable());
-
 		// @formatter:on
 
 		return http.build();

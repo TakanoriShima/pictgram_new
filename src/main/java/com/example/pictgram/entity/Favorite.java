@@ -15,7 +15,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Entity
-@Table(name = "favorite")
+@Table(name = "favorites")
 @Data
 @EqualsAndHashCode(callSuper=false)
 public class Favorite extends AbstractEntity implements Serializable {

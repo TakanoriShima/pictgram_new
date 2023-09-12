@@ -17,7 +17,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Entity
-@Table(name = "topic")
+@Table(name = "topics")
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class Topic extends AbstractEntity implements Serializable {

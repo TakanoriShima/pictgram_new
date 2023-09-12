@@ -13,7 +13,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Entity
-@Table(name = "comment")
+@Table(name = "comments")
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class Comment extends AbstractEntity implements Serializable {
