@@ -15,6 +15,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.Authentication;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.thymeleaf.context.Context;
 
 import com.example.pictgram.entity.Comment;
 import com.example.pictgram.entity.Favorite;
@@ -40,6 +42,7 @@ import com.example.pictgram.form.FavoriteForm;
 import com.example.pictgram.form.TopicForm;
 import com.example.pictgram.form.UserForm;
 import com.example.pictgram.repository.TopicRepository;
+import com.example.pictgram.service.SendMailService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -57,6 +60,9 @@ public class TopicsController {
 	//    @Autowired
 	private HttpServletRequest request;
 	private MessageSource messageSource;
+
+	@Autowired
+	private SendMailService sendMailService;
 
 	private TopicsController(ModelMapper modelMapper, TopicRepository repository, HttpServletRequest request,
 			MessageSource messageSource) {
@@ -207,6 +213,11 @@ public class TopicsController {
 		//		redirAttrs.addFlashAttribute("message", "投稿に成功しました。");
 		redirAttrs.addFlashAttribute("message",
 				messageSource.getMessage("topics.create.flash.2", new String[] {}, locale));
+		Context context = new Context();
+		context.setVariable("title", "【Pictgram】新規投稿");
+		context.setVariable("name", user.getUsername());
+		context.setVariable("description", entity.getDescription());
+		sendMailService.sendMail(context);
 
 		return "redirect:/topics";
 	}
