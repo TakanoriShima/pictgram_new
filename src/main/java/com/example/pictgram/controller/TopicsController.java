@@ -1,5 +1,6 @@
 package com.example.pictgram.controller;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,6 +13,12 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.sanselan.ImageReadException;
+import org.apache.sanselan.Sanselan;
+import org.apache.sanselan.common.IImageMetadata;
+import org.apache.sanselan.formats.jpeg.JpegImageMetadata;
+import org.apache.sanselan.formats.tiff.TiffImageMetadata.GPSInfo;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +38,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.thymeleaf.context.Context;
 
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.Tag;
 import com.example.pictgram.entity.Comment;
 import com.example.pictgram.entity.Favorite;
 import com.example.pictgram.entity.Topic;
@@ -174,12 +186,7 @@ public class TopicsController {
 	}
 
 	@PostMapping("/topic")
-	//	public String create(Principal principal, @Validated @ModelAttribute("form") TopicForm form, BindingResult result,
-	//			Model model, @RequestParam MultipartFile image, RedirectAttributes redirAttrs)
-	//			throws IOException {
-	public String create(Principal principal, @Validated @ModelAttribute("form") TopicForm form, BindingResult result,
-			Model model, @RequestParam MultipartFile image, RedirectAttributes redirAttrs, Locale locale)
-			throws IOException {
+		public String create(Principal principal, @Validated @ModelAttribute("form") TopicForm form, BindingResult result, Model model, @RequestParam MultipartFile image, RedirectAttributes redirAttrs, Locale locale) throws ImageProcessingException, IOException, ImageReadException {
 		if (result.hasErrors()) {
 			model.addAttribute("hasMessage", true);
 			model.addAttribute("class", "alert-danger");
@@ -221,7 +228,8 @@ public class TopicsController {
 		return "redirect:/topics";
 	}
 
-	private File saveImageLocal(MultipartFile image, Topic entity) throws IOException {
+	private File saveImageLocal(MultipartFile image, Topic entity)
+			throws IOException, ImageProcessingException, ImageReadException {
 		File uploadDir = new File("/uploads");
 		uploadDir.mkdir();
 
@@ -233,8 +241,57 @@ public class TopicsController {
 		String fileName = image.getOriginalFilename();
 		File destFile = new File(realPathToUploads, fileName);
 		image.transferTo(destFile);
+		
+		setGeoInfo(entity, destFile, image.getOriginalFilename());
 
 		return destFile;
+	}
+
+	private void setGeoInfo(Topic entity, File destFile, String fileName)
+			throws ImageProcessingException, IOException, ImageReadException {
+		Metadata metadata = ImageMetadataReader.readMetadata(destFile);
+		setGeoInfo(entity, metadata, null, destFile, fileName);
+	}
+
+	private void setGeoInfo(Topic entity, Metadata metadata, BufferedInputStream inputStream, File destFile,
+			String fileName) {
+		if (log.isDebugEnabled()) {
+			for (Directory directory : metadata.getDirectories()) {
+				for (Tag tag : directory.getTags()) {
+					log.debug("{} {}", tag.toString(), tag.getTagType());
+				}
+			}
+		}
+
+		try {
+			IImageMetadata iMetadata = null;
+			if (inputStream != null) {
+				iMetadata = Sanselan.getMetadata(inputStream, fileName);
+				IOUtils.closeQuietly(inputStream);
+			}
+			if (destFile != null) {
+				iMetadata = Sanselan.getMetadata(destFile);
+			}
+			if (iMetadata != null) {
+				GPSInfo gpsInfo = null;
+				if (iMetadata instanceof JpegImageMetadata) {
+					gpsInfo = ((JpegImageMetadata) iMetadata).getExif().getGPS();
+					if (gpsInfo != null) {
+						log.debug("latitude={}", gpsInfo.getLatitudeAsDegreesNorth());
+						log.debug("longitude={}", gpsInfo.getLongitudeAsDegreesEast());
+						entity.setLatitude(gpsInfo.getLatitudeAsDegreesNorth());
+						entity.setLongitude(gpsInfo.getLongitudeAsDegreesEast());
+					}
+				} else {
+					List<?> items = iMetadata.getItems();
+					for (Object item : items) {
+						log.debug(item.toString());
+					}
+				}
+			}
+		} catch (ImageReadException | IOException e) {
+			log.warn(e.getMessage(), e);
+		}
 	}
 
 }
