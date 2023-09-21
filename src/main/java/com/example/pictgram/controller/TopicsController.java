@@ -15,7 +15,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.Authentication;
@@ -60,15 +59,16 @@ public class TopicsController {
 	private HttpServletRequest request;
 	private MessageSource messageSource;
 
-	@Autowired
+//	@Autowired
 	private SendMailService sendMailService;
 
 	private TopicsController(ModelMapper modelMapper, TopicRepository repository, HttpServletRequest request,
-			MessageSource messageSource) {
+			MessageSource messageSource, SendMailService sendMailService) {
 		this.modelMapper = modelMapper;
 		this.repository = repository;
 		this.request = request;
 		this.messageSource = messageSource;
+		this.sendMailService = sendMailService;
 
 	}
 
