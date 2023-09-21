@@ -82,7 +82,7 @@ public class SecurityConfig {
 						.invalidateHttpSession(true)
 						.deleteCookies("JSESSIONID")
 						.permitAll())
-				.oauth2Login(o -> o
+				.oauth2Login(oauth2 -> oauth2
 						.loginPage("/login") // ログイン画面
 						.defaultSuccessUrl("/topics") // ログイン成功時の遷移先
 						.failureUrl("/login-failure") // ログイン失敗時の遷移先
@@ -90,6 +90,9 @@ public class SecurityConfig {
 						.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
 								.oidcUserService(this.oidcUserService())
 								.userService(this.oauth2UserService())))
+//				.requiresChannel(channel -> channel
+//			            .requestMatchers(r -> "https".equals(r.getHeader("X-Forwarded-Proto")))
+//			            .requiresSecure()) // HTTPSを要求する
 				.csrf(csrf -> csrf
 						.ignoringRequestMatchers(h2RequestMatcher))
 				.headers(headers -> headers.frameOptions(

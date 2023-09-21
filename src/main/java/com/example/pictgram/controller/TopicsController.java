@@ -105,6 +105,7 @@ public class TopicsController {
 			list.add(form);
 		}
 		model.addAttribute("list", list);
+		model.addAttribute("hasFooter", true);
 
 		System.out.println("テスト！");
 		for (TopicForm f : list) {
