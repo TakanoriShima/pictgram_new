@@ -26,8 +26,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -174,7 +173,7 @@ public class TopicsController {
 		return "topics/new";
 	}
 
-	@RequestMapping(value = "/topic", method = RequestMethod.POST)
+	@PostMapping("/topic")
 	//	public String create(Principal principal, @Validated @ModelAttribute("form") TopicForm form, BindingResult result,
 	//			Model model, @RequestParam MultipartFile image, RedirectAttributes redirAttrs)
 	//			throws IOException {
@@ -214,9 +213,6 @@ public class TopicsController {
 		redirAttrs.addFlashAttribute("message",
 				messageSource.getMessage("topics.create.flash.2", new String[] {}, locale));
 		Context context = new Context();
-		context.setVariable("title", "【Pictgram】新規投稿");
-		context.setVariable("name", user.getUsername());
-		context.setVariable("description", entity.getDescription());
 		sendMailService.sendMail(context);
 
 		return "redirect:/topics";
