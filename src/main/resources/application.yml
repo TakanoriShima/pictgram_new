@@ -37,7 +37,5 @@ spring:
             clientSecret: ${github.client.secret}                        
 image:
   local: true
-onesignal:
-  id: ${onesignal.id}  
 googlemap:
   key: ${googlemap.key}      

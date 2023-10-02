@@ -62,7 +62,8 @@ public class SecurityConfig {
 				new AntPathRequestMatcher("/scripts/**"),
 				new AntPathRequestMatcher("/images/**"),
 				new AntPathRequestMatcher("/favicon.ico"),
-				new AntPathRequestMatcher("/OneSignalSDKWorker.js"),
+				new AntPathRequestMatcher("/push7-worker.js"),
+				new AntPathRequestMatcher("/manifest.json"),
 				new AntPathRequestMatcher("/error"),
 				new AntPathRequestMatcher("/"));
 
